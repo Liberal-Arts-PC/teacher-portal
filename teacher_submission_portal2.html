@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบส่งเอกสารอาจารย์ (Teacher Submission Portal)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Prompt) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <header class="bg-gradient-to-r from-blue-900 via-indigo-800 to-slate-900 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-500/20 p-3 rounded-2xl border border-blue-400/30 shadow-inner flex items-center justify-center">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-blue-300"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
+                            <span>ระบบส่งงานสำหรับอาจารย์</span>
+                            <span class="text-xs bg-emerald-500/30 text-emerald-300 font-normal px-2.5 py-0.5 rounded-full border border-emerald-400/20">Online Portal</span>
+                        </h1>
+                        <p class="text-xs sm:text-sm text-blue-200">Teacher Work Submission Portal • มหาวิทยาลัยเทคโนโลยีราชมงคลรัตนโกสินทร์</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <a href="#historySection" onclick="scrollToHistory()" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md active:scale-95">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>ประวัติการส่งงานของคุณ</span>
+                        <span id="historyBadgeCount" class="bg-white/20 text-white px-1.5 py-0.5 rounded-md text-[10px]">0</span>
+                    </a>
+                    <button onclick="openBroadcastModal()" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2.5 rounded-xl text-xs font-medium border border-white/10 transition-all">
+                        <i class="fa-solid fa-bullhorn text-amber-400"></i>
+                        <span class="hidden sm:inline">ประกาศรวม</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
+        
+        <!-- Teacher Direct Instructions Banner -->
+        <div class="bg-gradient-to-r from-indigo-900 via-slate-900 to-blue-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl mb-8 border border-white/10 relative overflow-hidden">
+            <div class="absolute -right-8 -top-8 text-white/5 text-9xl pointer-events-none">
+                <i class="fa-solid fa-folder-closed"></i>
+            </div>
+            <div class="relative z-10 max-w-3xl">
+                <div class="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-medium border border-blue-400/30 mb-3">
+                    <i class="fa-solid fa-hand-pointer animate-bounce"></i>
+                    <span>คำแนะนำการใช้งานสำหรับอาจารย์</span>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold leading-relaxed mb-2">
+                    กรุณาค้นหาและเลือกชื่อของท่าน เพื่อไปยัง Google Drive ส่งงานส่วนตัว
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    ระบบจะนำท่านไปยังโฟลเดอร์ Google Drive เฉพาะบุคคลโดยตรง เพื่อความถูกต้อง ปลอดภัย และป้องกันเอกสารปะปนกัน สามารถบันทึกประวัติการส่งงานไว้ในเครื่องได้ทันที
+                </p>
+
+                <!-- Steps Quick Indicator -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+                    <div class="flex items-center gap-3 bg-white/10 p-3 rounded-2xl border border-white/10 backdrop-blur-sm">
+                        <div class="w-8 h-8 rounded-xl bg-blue-500 font-bold text-white flex items-center justify-center text-xs shrink-0">1</div>
+                        <div class="text-xs">
+                            <div class="font-semibold text-white">ค้นหาชื่อท่าน</div>
+                            <div class="text-[11px] text-slate-300">พิมพ์ชื่อ สกุล หรืออีเมล</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white/10 p-3 rounded-2xl border border-white/10 backdrop-blur-sm">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-500 font-bold text-white flex items-center justify-center text-xs shrink-0">2</div>
+                        <div class="text-xs">
+                            <div class="font-semibold text-white">กดปุ่มส่งงาน</div>
+                            <div class="text-[11px] text-slate-300">เปิด Google Drive ส่วนตัว</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white/10 p-3 rounded-2xl border border-white/10 backdrop-blur-sm">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500 font-bold text-white flex items-center justify-center text-xs shrink-0">3</div>
+                        <div class="text-xs">
+                            <div class="font-semibold text-white">ลงบันทึกประวัติ</div>
+                            <div class="text-[11px] text-slate-300">เก็บหลักฐานการส่งงาน</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary & Stats Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between hover:shadow-md transition-shadow">
+                <div>
+                    <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">จำนวนอาจารย์ทั้งหมด</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1" id="statTotalCount">11 ท่าน</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">พร้อมโฟลเดอร์ Drive ประจำตัว</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-xl font-bold">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between hover:shadow-md transition-shadow">
+                <div>
+                    <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">สถานะโฟลเดอร์ส่งงาน</p>
+                    <h3 class="text-2xl font-bold text-emerald-600 mt-1">พร้อมใช้งาน 100%</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">แยกโฟลเดอร์เฉพาะรายบุคคล</p>
+                </div>
+                <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 text-xl">
+                    <i class="fa-solid fa-folder-check"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between hover:shadow-md transition-shadow">
+                <div>
+                    <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">บันทึกการส่งงานของคุณ</p>
+                    <h3 class="text-2xl font-bold text-indigo-600 mt-1" id="statHistoryCount">0 รายการ</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">เช็คอินการส่งในเครื่องนี้</p>
+                </div>
+                <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 text-xl">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200/80 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <!-- Search Box -->
+            <div class="relative w-full md:w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="ค้นหาชื่ออาจารย์ หรืออีเมลเพื่อส่งงาน..." 
+                    class="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400 font-medium"
+                    oninput="handleSearch()"
+                >
+                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+
+            <!-- View Toggle & Actions -->
+            <div class="flex items-center justify-between md:justify-end w-full md:w-auto gap-3">
+                <span class="text-xs font-medium text-slate-500 hidden sm:inline">รูปแบบการแสดงผล:</span>
+                <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button 
+                        id="btnCardView" 
+                        onclick="switchView('card')" 
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-blue-700 shadow-sm"
+                    >
+                        <i class="fa-solid fa-border-all"></i>
+                        <span>การ์ด</span>
+                    </button>
+                    <button 
+                        id="btnTableView" 
+                        onclick="switchView('table')" 
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all"
+                    >
+                        <i class="fa-solid fa-list-ul"></i>
+                        <span>ตาราง</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid View Container -->
+        <div id="cardViewContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Cards generated by JS -->
+        </div>
+
+        <!-- Table View Container -->
+        <div id="tableViewContainer" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-medium text-xs uppercase tracking-wider">
+                            <th class="py-4 px-6">ลำดับ</th>
+                            <th class="py-4 px-6">อาจารย์ผู้รับเอกสาร</th>
+                            <th class="py-4 px-6">อีเมลติดต่อ</th>
+                            <th class="py-4 px-6">โฟลเดอร์ Google Drive</th>
+                            <th class="py-4 px-6 text-right">ดำเนินการส่งงาน</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-100">
+                        <!-- Dynamic Rows generated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty Search State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300 my-6">
+            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h4 class="text-base font-semibold text-slate-700">ไม่พบรายชื่ออาจารย์ที่ค้นหา</h4>
+            <p class="text-xs text-slate-500 mt-1">โปรดลองพิมพ์คำค้นด้วยชื่อ สกุล หรืออีเมลใหม่อีกครั้ง</p>
+            <button onclick="clearSearch()" class="mt-4 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-semibold hover:bg-blue-100 transition-all">
+                ล้างคำค้นหา
+            </button>
+        </div>
+
+        <!-- Local Submission History Section -->
+        <div id="historySection" class="mt-12 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">ประวัติการบันทึกส่งงานของคุณ (Local Log)</h3>
+                        <p class="text-xs text-slate-500">บันทึกประวัติเอกสารที่คุณกดส่งในเครื่องนี้เพื่อใช้อ้างอิงย้อนหลัง</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="clearAllHistory()" class="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-xl transition-all border border-red-100">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>ล้างประวัติทั้งหมด</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- History List Table -->
+            <div id="historyListContainer" class="overflow-x-auto custom-scrollbar">
+                <!-- Dynamically filled by JS -->
+            </div>
+        </div>
+
+        <!-- Instruction Guide Section -->
+        <div id="guide" class="mt-12 bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="bg-indigo-500/30 text-indigo-300 p-2 rounded-lg border border-indigo-400/20">
+                        <i class="fa-solid fa-circle-info text-xl"></i>
+                    </span>
+                    <h3 class="text-lg font-bold">ข้อปฏิบัติในการส่งเอกสารสำหรับอาจารย์</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-indigo-100/90 mt-4">
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <div class="font-bold text-white mb-1 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-indigo-500 text-xs flex items-center justify-center font-semibold">1</span>
+                            ตรวจสอบชื่อโฟลเดอร์
+                        </div>
+                        <p class="text-xs leading-relaxed text-indigo-200">โปรดตรวจสอบว่าเข้าสู่โฟลเดอร์ Google Drive ที่เป็นชื่อ-สกุลของท่านถูกต้องก่อนอัปโหลดไฟล์</p>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <div class="font-bold text-white mb-1 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-indigo-500 text-xs flex items-center justify-center font-semibold">2</span>
+                            ส่งในโฟลเดอร์ตนเองเท่านั้น
+                        </div>
+                        <p class="text-xs leading-relaxed text-indigo-200">อัปโหลดไฟล์งานลงโฟลเดอร์ส่วนตัวเท่านั้น ไม่แก้ไขหรือลบไฟล์งานของอาจารย์ท่านอื่น</p>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                        <div class="font-bold text-white mb-1 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-indigo-500 text-xs flex items-center justify-center font-semibold">3</span>
+                            บันทึกหลักฐานการส่ง
+                        </div>
+                        <p class="text-xs leading-relaxed text-indigo-200">เมื่ออัปโหลดงานเรียบร้อยแล้ว ท่านสามารถกรอกชื่องานในระบบเพื่อบันทึกวันเวลาส่งไว้ตรวจสอบย้อนหลังได้</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Teacher Submission Hub & Direct Action -->
+    <div id="submissionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-100" id="submissionModalCard">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-6">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        <div id="modalTeacherAvatar" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md border border-white/20">
+                            ท
+                        </div>
+                        <div>
+                            <span class="inline-block text-[10px] uppercase font-semibold text-blue-300 tracking-wider bg-white/10 px-2 py-0.5 rounded-md mb-1">หน้าต่างเข้าสู่โฟลเดอร์ส่งงาน</span>
+                            <h3 class="font-bold text-base leading-snug" id="modalTeacherNameTitle">อาจารย์...</h3>
+                            <p class="text-xs text-blue-200 font-mono mt-0.5" id="modalTeacherEmailSub">email@rmutr.ac.th</p>
+                        </div>
+                    </div>
+                    <button onclick="closeSubmissionModal()" class="text-slate-300 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                <!-- Direct Google Drive Action Box -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50/60 p-5 rounded-2xl border border-blue-100/80 text-center space-y-3">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto text-xl shadow-md">
+                        <i class="fa-brands fa-google-drive"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">ไปยังโฟลเดอร์ Google Drive ของคุณ</h4>
+                        <p class="text-xs text-slate-500 mt-1">คลิกปุ่มด้านล่างเพื่อเปิด Google Drive แท็บใหม่สำหรับลากวางอัปโหลดไฟล์งาน</p>
+                    </div>
+                    <a id="modalDriveDirectBtn" href="#" target="_blank" rel="noopener noreferrer" onclick="handleDirectDriveClick()"
+                        class="w-full inline-flex items-center justify-center gap-2.5 bg-blue-600 hover:bg-blue-700 text-white py-3 px-5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg active:scale-95">
+                        <i class="fa-solid fa-folder-open text-base"></i>
+                        <span>📁 เปิด Google Drive ส่วนตัวเพื่ออัปโหลดงาน</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-80"></i>
+                    </a>
+                </div>
+
+                <!-- Record Submission Check-in Form -->
+                <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-clipboard-check text-indigo-600"></i>
+                            <span>บันทึกหลักฐานการส่งงาน (Check-in)</span>
+                        </label>
+                        <span class="text-[10px] text-slate-400">เก็บประวัติในเครื่อง</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-500 mb-1">ชื่องาน / ชื่อเอกสารที่ส่ง *</label>
+                        <input type="text" id="modalDocTitleInput" placeholder="เช่น แผนการสอน มคอ.3 ภาคเรียน 2/2569" 
+                            class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-500 mb-1">หมายเหตุเพิ่มเติม (ถ้ามี)</label>
+                        <input type="text" id="modalDocNoteInput" placeholder="เช่น ส่งฉบับแก้ไขครั้งที่ 1" 
+                            class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        >
+                    </div>
+
+                    <button onclick="recordSubmissionLog()" class="w-full inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-4 rounded-xl text-xs font-semibold transition-all shadow-sm active:scale-95">
+                        <i class="fa-solid fa-bookmark"></i>
+                        <span>ลงบันทึกประวัติการส่งงานนี้</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+                <button onclick="copyCurrentTeacherDriveUrl()" class="text-xs font-medium text-slate-600 hover:text-blue-600 flex items-center gap-1.5">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>คัดลอกลิงก์ Google Drive</span>
+                </button>
+                <button onclick="closeSubmissionModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 rounded-xl transition-all">
+                    ปิดหน้าต่าง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Broadcast Announcement Message Generator -->
+    <div id="broadcastModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-100" id="broadcastModalCard">
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-900 to-blue-900 text-white p-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg border border-amber-400/30">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base">สร้างข้อความประกาศรวมส่งทาง LINE / Email</h3>
+                        <p class="text-xs text-slate-300">รวบรวมรายชื่อและลิงก์ส่งงานของอาจารย์ทั้ง 11 ท่าน</p>
+                    </div>
+                </div>
+                <button onclick="closeBroadcastModal()" class="text-slate-300 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <textarea id="broadcastTextarea" readonly class="w-full h-64 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-mono text-slate-700 focus:outline-none custom-scrollbar leading-relaxed resize-none"></textarea>
+                <div class="flex items-center justify-between gap-3 pt-2">
+                    <button onclick="copyBroadcastText()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>คัดลอกข้อความประกาศรวมทั้งหมด</span>
+                    </button>
+                    <button onclick="closeBroadcastModal()" class="px-5 py-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all">
+                        ปิด
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Individual Message Generator -->
+    <div id="individualModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-100" id="individualModalCard">
+            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white p-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-lg border border-indigo-400/30">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base">ข้อความแจ้งรายบุคคล</h3>
+                        <p class="text-xs text-indigo-200" id="indivModalTeacherName">อาจารย์...</p>
+                    </div>
+                </div>
+                <button onclick="closeIndividualModal()" class="text-slate-300 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ระบุชื่องาน / กำหนดส่ง (ตัวเลือกเสริม):</label>
+                    <input type="text" id="indivDocSubjectInput" placeholder="เช่น แผนการสอน มคอ.3 ภาคเรียน 2/2569" oninput="updateIndividualTextPreview()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ตัวอย่างข้อความอัตโนมัติ:</label>
+                    <textarea id="individualTextarea" readonly class="w-full h-44 p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-mono text-slate-700 focus:outline-none custom-scrollbar leading-relaxed resize-none"></textarea>
+                </div>
+                <div class="flex items-center justify-between gap-3 pt-2">
+                    <button onclick="copyIndividualText()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>คัดลอกข้อความแจ้งรายบุคคล</span>
+                    </button>
+                    <button onclick="closeIndividualModal()" class="px-5 py-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all">
+                        ปิด
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Master Dataset of Teachers (Intact 11 records)
+        const teachersData = [
+            {
+                id: 1,
+                name: "ผู้ช่วยศาสตราจารย์ ดร.จินตนา ฉัตรบูรภานันท์",
+                email: "jintana.c@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1YxV8gTHw4XAw91BDYHVXSx13BSGHKB3R",
+                avatarBg: "from-blue-500 to-indigo-600"
+            },
+            {
+                id: 2,
+                name: "ผู้ช่วยศาสตราจารย์ ดร.วัฒนา แช่มวงษ์",
+                email: "wattana.cha@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1x8_udLwSQVRNk_h_FIUesGI3F0KwjEQU",
+                avatarBg: "from-indigo-500 to-purple-600"
+            },
+            {
+                id: 3,
+                name: "ผู้ช่วยศาสตราจารย์ ดร.กัลยา นามสงวน",
+                email: "kanlaya.nam@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/15gDxELjHgJFj6deGNrORwd8PUGbmjb8l",
+                avatarBg: "from-purple-500 to-pink-600"
+            },
+            {
+                id: 4,
+                name: "ผู้ช่วยศาสตราจารย์ ดร.กานต์รวี แพทย์พิทักษ์",
+                email: "kanrawi.pha@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1S9lXzpQRHbye2MzayzPTY0Pbk24HmjQw",
+                avatarBg: "from-rose-500 to-red-600"
+            },
+            {
+                id: 5,
+                name: "อาจารย์วิชชนี โยเหลา",
+                email: "witchanee.yol@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1UezUQvIrhFkEUkq2bDpBuuBYtcT5tFMf",
+                avatarBg: "from-amber-500 to-orange-600"
+            },
+            {
+                id: 6,
+                name: "ดร.มณรดา ศิลปบรรเลง",
+                email: "manarada.sil@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1uthmC1Uaz3Q1r_YyYsH5z7ckoLsuO294",
+                avatarBg: "from-emerald-500 to-teal-600"
+            },
+            {
+                id: 7,
+                name: "อาจารย์อภินันท์ ศรีไพวัลย์",
+                email: "apinan.sri@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1G11zvVtr7hPUiRjW8Q4p82Nh5VLs9ca4",
+                avatarBg: "from-teal-500 to-cyan-600"
+            },
+            {
+                id: 8,
+                name: "อาจารย์บุษบง ทองหนู",
+                email: "bussabong.ton@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1_wSlUsFJBc3cgVbSTdTMgcZj1Gh5XR_B",
+                avatarBg: "from-cyan-500 to-blue-600"
+            },
+            {
+                id: 9,
+                name: "อาจารย์รมนปวีร์ ชุณห์วิสิทธิกิจ",
+                email: "ramonpawee.chu@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1uLpVBzU4J_yCHC4i5msWu1dIQ8aIHgNU",
+                avatarBg: "from-sky-500 to-indigo-600"
+            },
+            {
+                id: 10,
+                name: "นางสาวศรยา สินไธสง",
+                email: "sorraya.sin@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1WiRkWtgq3XSm_apJ4D1YG6kAk9rB9Pa7",
+                avatarBg: "from-violet-500 to-purple-600"
+            },
+            {
+                id: 11,
+                name: "นางนิชดา ผูกไมตรี",
+                email: "nichada.tup@rmutr.ac.th",
+                url: "https://drive.google.com/drive/folders/1ylRakZYDo31nUcX_qQZS-4cLKRaK36-k",
+                avatarBg: "from-fuchsia-500 to-pink-600"
+            }
+        ];
+
+        let activeView = 'card';
+        let currentFilteredList = [...teachersData];
+        let selectedTeacherForModal = null;
+        let selectedTeacherForIndividual = null;
+        let localSubmissionLogs = [];
+
+        // Utility Function: Get Initials from Thai Names
+        function getInitials(name) {
+            if (!name) return 'ท';
+            let cleanName = name.replace(/^(ผู้ช่วยศาสตราจารย์|รองศาสตราจารย์|ศาสตราจารย์|ดร\.|อาจารย์|นางสาว|นาง|นาย)\s*/g, '').trim();
+            return cleanName.charAt(0) || 'ท';
+        }
+
+        // Search & Filter Functions
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (query) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            currentFilteredList = teachersData.filter(t => 
+                t.name.toLowerCase().includes(query) || 
+                t.email.toLowerCase().includes(query)
+            );
+            renderPortal();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            handleSearch();
+        }
+
+        // View Switcher Function
+        function switchView(view) {
+            activeView = view;
+            const cardContainer = document.getElementById('cardViewContainer');
+            const tableView = document.getElementById('tableViewContainer');
+            const btnCard = document.getElementById('btnCardView');
+            const btnTable = document.getElementById('btnTableView');
+
+            if (view === 'card') {
+                cardContainer.classList.remove('hidden');
+                tableView.classList.add('hidden');
+                btnCard.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-blue-700 shadow-sm";
+                btnTable.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all";
+            } else {
+                cardContainer.classList.add('hidden');
+                tableView.classList.remove('hidden');
+                btnTable.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-blue-700 shadow-sm";
+                btnCard.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all";
+            }
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            let toast = document.getElementById('toastNotification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toastNotification';
+                toast.className = 'fixed bottom-5 right-5 z-50 transition-all duration-300 transform translate-y-10 opacity-0 pointer-events-none';
+                document.body.appendChild(toast);
+            }
+
+            const bgColor = type === 'error' ? 'bg-red-600' : 'bg-slate-900';
+            const icon = type === 'error' ? 'fa-circle-exclamation text-red-300' : 'fa-circle-check text-emerald-400';
+
+            toast.innerHTML = `
+                <div class="${bgColor} text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-xs font-medium border border-white/10">
+                    <i class="fa-solid ${icon} text-base"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+
+            toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // Clipboard Copy Helper
+        function copyToClipboard(text, successMsg) {
+            if (!text) return;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg || 'คัดลอกลงคลิปบอร์ดเรียบร้อยแล้ว');
+            } catch (err) {
+                showToast('ไม่สามารถคัดลอกข้อความได้', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // Broadcast Modal Handlers
+        function openBroadcastModal() {
+            let msg = "เรียน อาจารย์ทุกท่าน\n\nขอความอนุเคราะห์อาจารย์ทุกท่านในการส่ง/อัปโหลดเอกสารงานเข้าใน Google Drive โฟลเดอร์ประจำตัวของท่านเองเท่านั้น เพื่อความเรียบร้อยและป้องกันเอกสารปะปนกันครับ/ค่ะ\n\n📌 รายชื่อและลิงก์โฟลเดอร์สำหรับส่งงานส่วนบุคคล:\n\n";
+            teachersData.forEach((t, i) => {
+                msg += `${i + 1}. ${t.name}\n🔗 ${t.url}\n\n`;
+            });
+            msg += "หากท่านใดพบปัญหาเกี่ยวกับสิทธิ์การเข้าถึงโฟลเดอร์ สามารถแจ้งกลับได้ทันทีครับ/ค่ะ\nขอขอบพระคุณเป็นอย่างยิ่งครับ/ค่ะ";
+
+            document.getElementById('broadcastTextarea').value = msg;
+            const modal = document.getElementById('broadcastModal');
+            const modalCard = document.getElementById('broadcastModalCard');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalCard.classList.remove('scale-95');
+                modalCard.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeBroadcastModal() {
+            const modal = document.getElementById('broadcastModal');
+            const modalCard = document.getElementById('broadcastModalCard');
+            modalCard.classList.remove('scale-100');
+            modalCard.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        function copyBroadcastText() {
+            const text = document.getElementById('broadcastTextarea').value;
+            copyToClipboard(text, 'คัดลอกข้อความประกาศรวมเรียบร้อยแล้ว');
+        }
+
+        // Individual Message Modal Handlers
+        function openIndividualModal(teacherId) {
+            selectedTeacherForIndividual = teachersData.find(t => t.id === teacherId);
+            if (!selectedTeacherForIndividual) return;
+
+            document.getElementById('indivModalTeacherName').innerText = selectedTeacherForIndividual.name;
+            document.getElementById('indivDocSubjectInput').value = '';
+            updateIndividualTextPreview();
+
+            const modal = document.getElementById('individualModal');
+            const modalCard = document.getElementById('individualModalCard');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalCard.classList.remove('scale-95');
+                modalCard.classList.add('scale-100');
+            }, 10);
+        }
+
+        function updateIndividualTextPreview() {
+            if (!selectedTeacherForIndividual) return;
+            const subject = document.getElementById('indivDocSubjectInput').value.trim();
+            const docText = subject ? `[${subject}]` : 'งาน/เอกสาร';
+
+            const msg = `เรียน ${selectedTeacherForIndividual.name}\n\nขออนุญาตแจ้งลิงก์ Google Drive สำหรับนำส่งเอกสาร ${docText} ครับ/ค่ะ โดยรบกวนอัปโหลดไฟล์งานลงในโฟลเดอร์ส่วนตัวตามลิงก์ด้านล่างนี้เท่านั้นครับ/ค่ะ:\n\n📁 ลิงก์โฟลเดอร์ส่งงานประจำตัว:\n${selectedTeacherForIndividual.url}\n\nหากอาจารย์ติดขัดปัญหาในการเข้าใช้งาน สามารถแจ้งกลับทางนี้ได้เลยครับ/ค่ะ\nขอขอบพระคุณครับ/ค่ะ`;
+
+            document.getElementById('individualTextarea').value = msg;
+        }
+
+        function closeIndividualModal() {
+            const modal = document.getElementById('individualModal');
+            const modalCard = document.getElementById('individualModalCard');
+            modalCard.classList.remove('scale-100');
+            modalCard.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        function copyIndividualText() {
+            const text = document.getElementById('individualTextarea').value;
+            copyToClipboard(text, 'คัดลอกข้อความแจ้งรายบุคคลเรียบร้อยแล้ว');
+        }
+
+        function renderPortal() {
+            const cardContainer = document.getElementById('cardViewContainer');
+            const tableBody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            const statFiltered = document.getElementById('statFilteredCount');
+
+            if (statFiltered) statFiltered.innerText = `${currentFilteredList.length} ท่าน`;
+
+            if (currentFilteredList.length === 0) {
+                cardContainer.innerHTML = '';
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            // Render Cards with Prominent Teacher Submission Actions
+            cardContainer.innerHTML = currentFilteredList.map(teacher => `
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <!-- Header & Avatar -->
+                        <div class="flex items-start justify-between gap-3 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr ${teacher.avatarBg} text-white flex items-center justify-center font-bold text-base shadow-sm group-hover:scale-105 transition-transform">
+                                    ${getInitials(teacher.name)}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-blue-600 transition-colors">${teacher.name}</h3>
+                                    <span class="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full mt-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        พร้อมรับส่งเอกสาร
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email Badge -->
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-4 flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-mono truncate mr-2" title="${teacher.email}">${teacher.email}</span>
+                            <button onclick="copyToClipboard('${teacher.email}', 'คัดลอกอีเมลเรียบร้อย')" class="text-slate-400 hover:text-blue-600 transition-colors p-1" title="คัดลอกอีเมล">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Primary Actions -->
+                    <div class="space-y-2 pt-2 border-t border-slate-100">
+                        <button onclick="openSubmissionModal(${teacher.id})" 
+                            class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl text-xs font-bold transition-all shadow-sm hover:shadow active:scale-95">
+                            <i class="fa-solid fa-paper-plane text-sm"></i>
+                            <span>📤 เข้าสู่โฟลเดอร์ส่งงาน</span>
+                        </button>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="${teacher.url}" target="_blank" rel="noopener noreferrer" 
+                                class="flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 px-3 rounded-xl text-xs font-medium transition-all">
+                                <i class="fa-brands fa-google-drive text-slate-500"></i>
+                                <span>เปิด Drive ตรง</span>
+                            </a>
+                            <button onclick="openIndividualModal(${teacher.id})" 
+                                class="flex items-center justify-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2 px-3 rounded-xl text-xs font-medium transition-all">
+                                <i class="fa-regular fa-comment-dots text-indigo-600"></i>
+                                <span>สร้างข้อความ</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render Table Rows
+            tableBody.innerHTML = currentFilteredList.map((teacher, idx) => `
+                <tr class="hover:bg-slate-50/70 transition-colors">
+                    <td class="py-4 px-6 text-xs text-slate-400 font-mono">${idx + 1}</td>
+                    <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr ${teacher.avatarBg} text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                                ${getInitials(teacher.name)}
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-800 text-sm">${teacher.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 text-xs font-mono text-slate-600">${teacher.email}</td>
+                    <td class="py-4 px-6">
+                        <a href="${teacher.url}" target="_blank" class="text-xs text-blue-600 hover:underline inline-flex items-center gap-1.5 font-medium">
+                            <i class="fa-brands fa-google-drive"></i>
+                            <span>โฟลเดอร์ Google Drive</span>
+                        </a>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <button onclick="openSubmissionModal(${teacher.id})" 
+                            class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition-all shadow-sm">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>ส่งงาน</span>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Submission Modal & History Log Handlers
+        function openSubmissionModal(teacherId) {
+            selectedTeacherForModal = teachersData.find(t => t.id === teacherId);
+            if (!selectedTeacherForModal) return;
+
+            document.getElementById('modalTeacherNameTitle').innerText = selectedTeacherForModal.name;
+            document.getElementById('modalTeacherEmailSub').innerText = selectedTeacherForModal.email;
+            document.getElementById('modalTeacherAvatar').innerText = getInitials(selectedTeacherForModal.name);
+            document.getElementById('modalTeacherAvatar').className = `w-12 h-12 rounded-2xl bg-gradient-to-tr ${selectedTeacherForModal.avatarBg} text-white flex items-center justify-center font-bold text-lg shadow-md border border-white/20`;
+
+            const driveBtn = document.getElementById('modalDriveDirectBtn');
+            driveBtn.href = selectedTeacherForModal.url;
+
+            document.getElementById('modalDocTitleInput').value = '';
+            document.getElementById('modalDocNoteInput').value = '';
+
+            const modal = document.getElementById('submissionModal');
+            const modalCard = document.getElementById('submissionModalCard');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalCard.classList.remove('scale-95');
+                modalCard.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeSubmissionModal() {
+            const modal = document.getElementById('submissionModal');
+            const modalCard = document.getElementById('submissionModalCard');
+            modalCard.classList.remove('scale-100');
+            modalCard.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        function handleDirectDriveClick() {
+            showToast('กำลังเปิดโฟลเดอร์ Google Drive ของอาจารย์ในแท็บใหม่');
+        }
+
+        function copyCurrentTeacherDriveUrl() {
+            if (selectedTeacherForModal) {
+                copyToClipboard(selectedTeacherForModal.url, 'คัดลอกลิงก์ Google Drive เรียบร้อยแล้ว');
+            }
+        }
+
+        // Local Storage History Management
+        function recordSubmissionLog() {
+            if (!selectedTeacherForModal) return;
+
+            const docTitle = document.getElementById('modalDocTitleInput').value.trim();
+            const note = document.getElementById('modalDocNoteInput').value.trim();
+
+            if (!docTitle) {
+                showToast('กรุณาระบุชื่องานหรือเอกสารที่ส่งก่อนกดบันทึก', 'error');
+                return;
+            }
+
+            const newLog = {
+                id: Date.now(),
+                teacherId: selectedTeacherForModal.id,
+                teacherName: selectedTeacherForModal.name,
+                docTitle: docTitle,
+                note: note,
+                driveUrl: selectedTeacherForModal.url,
+                timestamp: new Date().toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' })
+            };
+
+            localSubmissionLogs.unshift(newLog);
+            saveHistoryToLocalStorage();
+            renderHistoryList();
+            showToast('ลงบันทึกประวัติการส่งงานในระบบเรียบร้อยแล้ว');
+            closeSubmissionModal();
+        }
+
+        function loadHistoryFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('teacher_portal_submission_history');
+                if (saved) {
+                    localSubmissionLogs = JSON.parse(saved);
+                }
+            } catch (e) {
+                localSubmissionLogs = [];
+            }
+            renderHistoryList();
+        }
+
+        function saveHistoryToLocalStorage() {
+            try {
+                localStorage.setItem('teacher_portal_submission_history', JSON.stringify(localSubmissionLogs));
+            } catch (e) {
+                console.error('Failed to save log to localStorage', e);
+            }
+        }
+
+        function renderHistoryList() {
+            const container = document.getElementById('historyListContainer');
+            const historyCountEl = document.getElementById('statHistoryCount');
+            const badgeCountEl = document.getElementById('historyBadgeCount');
+
+            if (historyCountEl) historyCountEl.innerText = `${localSubmissionLogs.length} รายการ`;
+            if (badgeCountEl) badgeCountEl.innerText = localSubmissionLogs.length;
+
+            if (localSubmissionLogs.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 text-xs">
+                        <i class="fa-regular fa-clipboard text-2xl mb-2 block text-slate-300"></i>
+                        ยังไม่มีประวัติการส่งงานที่ลงบันทึกในเครื่องนี้
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                            <th class="py-3 px-4">วัน-เวลาที่ลงบันทึก</th>
+                            <th class="py-3 px-4">อาจารย์ผู้ส่ง</th>
+                            <th class="py-3 px-4">ชื่องาน / เอกสารที่ส่ง</th>
+                            <th class="py-3 px-4">หมายเหตุ</th>
+                            <th class="py-3 px-4 text-right">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        ${localSubmissionLogs.map(item => `
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="py-3 px-4 text-slate-400 font-mono whitespace-nowrap">${item.timestamp}</td>
+                                <td class="py-3 px-4 font-semibold text-slate-800">${item.teacherName}</td>
+                                <td class="py-3 px-4 text-indigo-700 font-medium">${item.docTitle}</td>
+                                <td class="py-3 px-4 text-slate-500">${item.note || '-'}</td>
+                                <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
+                                    <a href="${item.driveUrl}" target="_blank" class="text-blue-600 hover:underline inline-flex items-center gap-1 font-medium">
+                                        <i class="fa-brands fa-google-drive"></i>
+                                        <span>ไดรฟ์</span>
+                                    </a>
+                                    <button onclick="deleteHistoryItem(${item.id})" class="text-red-500 hover:text-red-700 p-1" title="ลบรายการนี้">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function deleteHistoryItem(id) {
+            localSubmissionLogs = localSubmissionLogs.filter(item => item.id !== id);
+            saveHistoryToLocalStorage();
+            renderHistoryList();
+            showToast('ลบรายการประวัติการส่งงานแล้ว');
+        }
+
+        function clearAllHistory() {
+            if (localSubmissionLogs.length === 0) return;
+            localSubmissionLogs = [];
+            saveHistoryToLocalStorage();
+            renderHistoryList();
+            showToast('ล้างประวัติการส่งงานทั้งหมดเรียบร้อยแล้ว');
+        }
+
+        function scrollToHistory() {
+            document.getElementById('historySection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = function() {
+            renderPortal();
+            loadHistoryFromLocalStorage();
+        };
+    </script>
+</body>
+</html>
